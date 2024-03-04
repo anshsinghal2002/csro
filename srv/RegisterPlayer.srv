@@ -1,0 +1,3 @@
+string player_id
+---
+int64 status
