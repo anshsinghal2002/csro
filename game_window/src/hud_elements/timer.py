@@ -45,7 +45,6 @@ class timer:
 
     def display (self, cv_image):
         if self.timer_on:
-            print("in timer")
             # if self.bkgrd_visible:
                 # print("background active")
                 # # copy to apply opacity effect later
@@ -64,11 +63,7 @@ class timer:
                 #                            0)
 
             # calculate the time to be displayed
-            print(f"start time: {self.start_time}")
-            print(f"timer max: {self.timer_max}")
-            print(f"timer end: {self.timer_end}")
             remaining_time = self.timer_end - time.time()
-            print(f"remaining time: {remaining_time}")
             if remaining_time <= 0:
                 minutes = 0
                 seconds = 0
@@ -90,8 +85,7 @@ class timer:
             text_center_posx = (self.center_pos[0] -(timer_text_size[0] // 2)) 
             text_center_posy = (self.center_pos[1] +(timer_text_size[1] // 2))
             text_center_pos = (text_center_posx, text_center_posy)
-
-            print(timer_text)
+            
             # put the timer on the image
             # the way we give the text outline is just to display the text twice but with
             # the outline text being slightly bigger.

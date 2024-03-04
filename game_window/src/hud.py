@@ -8,7 +8,8 @@ from std_msgs.msg import String
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 import time
-from hud_elements import crosshair, healthbar, timer
+from hud_elements import crosshair, healthbar, timer, minimap
+import asyncio
 
 class hud_ui:
     # instance variables
@@ -26,6 +27,7 @@ class hud_ui:
         self.crosshair = crosshair.crosshair()
         self.healthbar = healthbar.healthbar()
         self.timer = timer.timer()
+        self.minimap = minimap.minimap()
 
 
     def callback(self,data):
@@ -47,6 +49,8 @@ class hud_ui:
         self.healthbar.display(cv_image)
         self.timer.display(cv_image)
 
+        self.minimap.display(cv_image)
+
         cv2.imshow(f"playerID: {self.player_id}", cv2.resize(cv_image, 
                                                              (int(cols*self.win_size_scaling), int(rows*self.win_size_scaling))))
         cv2.waitKey(3)
@@ -57,7 +61,14 @@ class hud_ui:
             print(e)
     
     
-
+"""
+# mini map settings:
+ global options: fixed frame
+ center around odom
+ topic: /scan
+ size(m): 0.05
+ decay time: 0.2
+"""
 
 
 if  __name__ == '__main__':
