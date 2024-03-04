@@ -2,16 +2,16 @@ import numpy as np
 import cv2
 
 # Read in the image
-image = cv2.imread("C:/Users/anshs/csro/opencv_toolkit/ex_img.jpg")
+image = cv2.imread("/home/singhala/csro/src/turtle_bot2.jpg")
 
 # Convert image to hue-saturation-value from RGB
 hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
 # Define lower and upper limits for different colors
 color_ranges = {
-    'pink': (np.array([142, 10, 20]), np.array([162, 255, 255])),
-    'yellow': (np.array([25, 10, 20]), np.array([45, 255, 255])),
-    'blue': (np.array([85, 10, 20]), np.array([97, 255, 255]))
+    'pink': (np.array([162, 100, 30]), np.array([182, 200, 255])),
+    'yellow': (np.array([25, 150, 20]), np.array([45, 225, 255])),
+    'blue': (np.array([85, 100, 20]), np.array([97, 225, 255]))
 }
 
 # Iterate over color ranges
@@ -24,7 +24,7 @@ for color, (lower_limit, upper_limit) in color_ranges.items():
     
     # Iterate over all contours for this color
     for contour in contours:
-        # Compute the bounding box of the contour
+        # Compute the bounding box of the contour   
         x, y, w, h = cv2.boundingRect(contour)
         
         if w>10:
