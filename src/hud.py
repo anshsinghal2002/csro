@@ -44,15 +44,16 @@ class hud_ui:
         # col: 320
         # channels: 3
         # cv2.circle(img=cv_image, center=(160,120), radius=30, color=(0,0,255))
-
+        self.timer.display(cv_image)
+        self.minimap.display(cv_image)
         self.crosshair.display(cv_image)
         self.healthbar.display(cv_image)
-        self.timer.display(cv_image)
-
-        self.minimap.display(cv_image)
+        
+        
 
         cv2.imshow(f"playerID: {self.player_id}", cv2.resize(cv_image, 
                                                              (int(cols*self.win_size_scaling), int(rows*self.win_size_scaling))))
+        
         cv2.waitKey(3)
 
         try:
