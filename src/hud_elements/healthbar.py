@@ -8,22 +8,24 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 import time
 
+
+
 class healthbar:
     ######################
     # healthbar settings #
     ######################
-    def __init__(self):
+    def __init__(self, center_pos):
         self.visible = True
         # health bar settings
         self.health_color = [255, 255, 255]  # white in BGR
         self.length = 240
         self.height = 16
-        self.center_pos = (160, 210)  # what point to center the healthbar around
+        self.center_pos = center_pos  # what point to center the healthbar around
             # calculate top left and bottom right coords for health bar
         self.top_l = (int(self.center_pos[0]-(self.length/2)), int(self.center_pos[1]+(self.height/2)))
         self.btm_r = (int(self.center_pos[0]+(self.length/2)), int(self.center_pos[1]-(self.height/2)))
         self.max_health = 120893
-        self.current_health = 43343
+        self.current_health = 120893
 
         ##############################
         # Health Percentage Settings #
@@ -42,10 +44,9 @@ class healthbar:
         self.boarder_visible = True
         self.boarder_color = [0, 0, 0]  # black
         self.b_thick = 2
-            # calculate boarder top left and 
+            # calculate boarder top left and bottom right
         self.brdr_topl = ((self.top_l[0]-self.b_thick), (self.top_l[1]+self.b_thick))
         self.brdr_btmr = ((self.btm_r[0]+self.b_thick), (self.btm_r[1]-self.b_thick))
-
         self.thickness = -1  # -1 = colored in rectangle
 
 
@@ -57,7 +58,7 @@ class healthbar:
             
             # calculate the current healthbar length and adjust the bottom right point accordingly
             # bandaid fix: when health is 0, health bar is still visible as a sliver
-            if self.current_health !=0:
+            if self.current_health >=0:
                 cur_health_len = int(self.length*(self.current_health/self.max_health))
                 new_btmr = ((self.top_l[0]+cur_health_len), (self.btm_r[1]))
 
@@ -81,7 +82,12 @@ class healthbar:
                         fontScale=self.hlth_prct_font_scale, 
                         color=self.hlth_txt_color, 
                         thickness=self.hlth_prct_thickness)
+                        
         
+                
+            # code to test health bar
+            self.current_health -= 80
+            self.health_percentage = int(round((self.current_health/self.max_health), 2) * 100)
         pass
         
             

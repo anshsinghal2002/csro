@@ -13,14 +13,18 @@ import matplotlib.pyplot as plt
 import os
 import asyncio
 
-
 class minimap:
     def __init__(self) -> None:
         self.visible = True
         matplotlib.use('agg')  # speeds up the matplotlib stuff 
         rospy.Subscriber('scan', LaserScan, self.laserReadingsCallback)
         self.angles = np.radians(np.arange(360))
-        self.laserReadings = np.zeros(360)
+        self.laserReadings = np.zeros(360)  # init as an array of 0s for now
+        self.curr_path = os.path.dirname(__file__)  # directory if we were to display the graph
+        
+        ####################
+        # minimap settings #
+        ####################
         self.map_range = 4  # defines how big the minimap is in meters. aka the mini map shows 4 meters around the robot
         self.map_size = 75  # how big the map is in pixels
         self.map_pos = ((320 - self.map_size - 5), 5)  # pos of where the map is
@@ -29,8 +33,7 @@ class minimap:
         self.turtle_size = self.map_pt_thickness + 100  # size of the turtle on the center of the map
         self.turtle_dot_color = 'b'  # what color the center of the turtle
         self.map_bkgrnd = [255, 255, 255]  # black map backgorund color
-        # self.curr_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-        self.curr_path = os.path.dirname(__file__)
+        
         pass
     
     def display(self, cv_image):
@@ -59,17 +62,19 @@ class minimap:
             # remove the margins and axis of matplotlib
             plt.axis('off')
             plt.margins(x=0, y=0)
+
+            # convert matplotlib graph into an image that can be displayed with opencv
             fig = plt.gcf()
             fig.canvas.draw()
             map = np.frombuffer(fig.canvas.tostring_rgb(), dtype=np.uint8)
             map = map.reshape(fig.canvas.get_width_height() + (3,))
-            minimap = cv2.resize(map, (75,75))
+            # scale down the map image to the right size
+            minimap = cv2.resize(map, (self.map_size,self.map_size))
+            # rotate the map so that it's orientation matches the turtlebot
             minimap = cv2.rotate(minimap, cv2.ROTATE_90_COUNTERCLOCKWISE)
-            # minimap = map
-            # x_offset=240
-            # y_offset=5
+            # add image onto the game_window by overwriting the pixels
             cv_image[self.map_pos[1]:self.map_pos[1]+minimap.shape[0], self.map_pos[0]:self.map_pos[0]+minimap.shape[1]] = minimap
-
+            # cv2.imshow("Minimap", minimap)
             # plt.savefig(self.curr_path + '/minimap.png', dpi=50, bbox_inches="tight")
             plt.close()
         pass

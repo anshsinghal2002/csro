@@ -17,7 +17,7 @@ class timer:
         self.start_time = time.time()
         self.timer_max = 60  # set max time to a minute for testing
         self.timer_end = self.start_time + self.timer_max
-        self.center_pos = (160, 16)  # what point to center the timer background around
+        self.center_pos = (160,10)  # what point to center the timer background around
         
         ############################################
         # settings for the background of the timer #
@@ -36,7 +36,7 @@ class timer:
         # timer text settings #
         #######################
         self.text_font = cv2.FONT_HERSHEY_DUPLEX
-        self.font_scale = 0.75
+        self.font_scale = 0.6
         self.font_color = [255, 255, 255]  # white
         self.thickness = 1
         # text outline settings
