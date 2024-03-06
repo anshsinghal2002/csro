@@ -85,6 +85,7 @@ if  __name__ == '__main__':
     game_window = hud_ui(args.player_id, args.band_color)
     print(args)
     rospy.init_node(f'game_window_converter_{args.player_id}_{args.band_color}', anonymous=True)
+    rospy.Rate(120)
 
     try:
         rospy.spin()
