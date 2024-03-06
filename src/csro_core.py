@@ -3,8 +3,13 @@
 import rospy
 from csro.srv import RegisterPlayer
 
+# Players list
+# Stores all RegisterPlayer objects
+players = []
+
 def register_player(req):
-    print("Req:", req)
+    players.append(req)
+    print(req)
     return 1
 
 if  __name__ == '__main__':
@@ -12,6 +17,7 @@ if  __name__ == '__main__':
     s = rospy.Service('register_player', RegisterPlayer, register_player)
 
     try:
+        print("csro_core started")
         rospy.spin()
     except KeyboardInterrupt:
         print("Shutting down")
