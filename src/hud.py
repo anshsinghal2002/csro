@@ -8,7 +8,7 @@ from std_msgs.msg import String
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 import time
-from hud_elements import crosshair, healthbar, timer, minimap, bottom_hud
+from hud_elements import crosshair, healthbar, timer, minimap, bottom_hud, kd_info
 import asyncio
 import cProfile
 import re
@@ -29,7 +29,7 @@ class hud_ui:
         self.crosshair = crosshair.crosshair()
         # self.healthbar = healthbar.healthbar()
         self.bottom_hud = bottom_hud.buttom_hud()
-        self
+        self.kd_info = kd_info.kd_info()
         self.timer = timer.timer()
         self.minimap = minimap.minimap()
 
@@ -48,11 +48,13 @@ class hud_ui:
         # col: 320
         # channels: 3
         # cv2.circle(img=cv_image, center=(160,120), radius=30, color=(0,0,255))
+        
         self.timer.display(cv_image)
         self.minimap.display(cv_image)
         self.crosshair.display(cv_image)
         # self.healthbar.display(cv_image)
         self.bottom_hud.display(cv_image)
+        self.kd_info.display(cv_image)
         
 
         cv2.imshow(f"playerID: {self.player_id}", cv2.resize(cv_image, 
