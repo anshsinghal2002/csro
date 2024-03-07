@@ -30,7 +30,7 @@ class weapon_info:
         self.font_color = [255, 255, 255]  # white
         self.txt_outline_color = [0, 0, 0]  # black
         self.text_colors = [self.txt_outline_color, self.font_color]
-        self.text_thicknesses = 1
+        self.text_thickness = 1
         self.outline_thickness = 2
         self.text_thicknesses = [self.outline_thickness, 0]
 
@@ -41,7 +41,7 @@ class weapon_info:
                                    text=self.weapon_name,
                                    pos=(self.brdr_topl[0], self.brdr_topl[1]-25),
                                    scale=self.wpn_name_txt_scaling,
-                                   text_thickness=1)
+                                   text_thickness=self.text_thickness)
         
         # display the ammo 
 
@@ -59,14 +59,14 @@ class weapon_info:
                                 text=f"{self.current_ammo}",
                                 pos=text_center_pos,
                                 scale=self.ammo_txt_scaling,
-                                text_thickness=1)
+                                text_thickness=self.text_thickness)
         
         # display remaining ammo in inventory
         self.display_outlined_text(cv_image,
                                 text=f"/{self.inventory_remaining_ammo}",
                                 pos=(self.center_pos[0] + 25, self.center_pos[1]-25),
                                 scale=self.rem_ammo_txt_scaling,
-                                text_thickness=1)
+                                text_thickness=self.text_thickness)
         
         
     def display_outlined_text(self, cv_image, text, pos, scale, text_thickness):
