@@ -8,7 +8,7 @@ if  __name__ == '__main__':
     register_player = rospy.ServiceProxy('register_player', RegisterPlayer)
 
     try:
-        resp1 = register_player("test")
+        resp1 = register_player("test_id", "test_color")
         print(resp1)
     except rospy.ServiceException as exc:
         print("Service did not process request: " + str(exc))
