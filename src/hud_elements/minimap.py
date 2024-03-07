@@ -77,6 +77,7 @@ class minimap:
             # cv2.imshow("Minimap", minimap)
             # plt.savefig(self.curr_path + '/minimap.png', dpi=50, bbox_inches="tight")
             plt.close()
+            # return cv_image
         pass
     
 

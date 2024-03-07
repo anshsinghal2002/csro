@@ -17,6 +17,7 @@ class kd_info:
         # where to display it one the screen (top left in this case)
         self.pose = (2,10)
 
+        # text settings
         self.text_font = cv2.FONT_HERSHEY_DUPLEX
         self.txt_scaling = 0.4
         self.font_color = [255, 255, 255]  # white

@@ -46,21 +46,23 @@ class timer:
     def display (self, cv_image):
         if self.timer_on:
             # if self.bkgrd_visible:
-                # print("background active")
-                # # copy to apply opacity effect later
-                # cv_img_cpy = cv_image.copy()  
-                # cv2.rectangle(cv_img_cpy, 
-                #               pt1=self.bkgrd_topl, 
-                #               pt2=self.bkgrd_btmr,
-                #               color=self.bkgrd_color,
-                #               thickness=self.bkgrd_thickness,
-                #               )
-                # # apply opacity effect
-                # cv_image = cv2.addWeighted(cv_img_cpy, 
-                #                            self.bkgrd_opacity, 
-                #                            cv_image, 
-                #                            1 - self.bkgrd_opacity, 
-                #                            0)
+            #     print("background active")
+            #     # copy to apply opacity effect later
+            #     cv_img_cpy = cv_image.copy()  
+            #     cv2.rectangle(cv_img_cpy, 
+            #                   pt1=self.bkgrd_topl, 
+            #                   pt2=self.bkgrd_btmr,
+            #                   color=self.bkgrd_color,
+            #                   thickness=self.bkgrd_thickness,
+            #                   )
+            #     # apply opacity effect
+            #     cv_image = cv2.addWeighted(cv_image,
+            #                                0.3, 
+            #                                cv_img_cpy,  
+            #                                0.7, 
+            #                                0)
+                
+            #     # cv2.imshow(f"txt",cv_image) 
 
             # calculate the time to be displayed
             remaining_time = self.timer_end - time.time()
@@ -106,5 +108,9 @@ class timer:
                         fontScale=self.font_scale, 
                         color=self.font_color, 
                         thickness=self.thickness)
+            
+  
+            # return cv_image
+                
         
         pass
