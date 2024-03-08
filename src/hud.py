@@ -86,7 +86,11 @@ class hud_ui:
         cv_image = self.cv_image
         # simulate taking damage in game. remove when csro node is done
         if rand.randint(0, 255) < 10:
-            cv_image = self.dmg_ani.display(self.cv_image)
+            cv_image = self.dmg_ani.display(self.cv_image, dead=False)
+        
+        # # simlate death 
+        # cv_image = self.dmg_ani.display(self.cv_image, dead=True)    
+
         return cv_image
         # self.minimap.display(self.cv_image)
         # cv2.imshow(f"playerID: {self.player_id}",self.cv_image)
