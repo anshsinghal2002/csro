@@ -1,17 +1,4 @@
-import roslib
-import sys
-import rospy
 import cv2
-import argparse
-from std_msgs.msg import String
-from sensor_msgs.msg import Image, LaserScan
-from cv_bridge import CvBridge, CvBridgeError
-import time
-import numpy as np
-import matplotlib
-import matplotlib.pyplot as plt
-import os
-import asyncio
 
 class weapon_info:
     def __init__(self, healthbar_topl, hb_top_center) -> None:

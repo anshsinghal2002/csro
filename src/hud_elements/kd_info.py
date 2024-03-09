@@ -1,12 +1,4 @@
-import roslib
-import sys
-import rospy
 import cv2
-import argparse
-from std_msgs.msg import String
-from sensor_msgs.msg import Image
-from cv_bridge import CvBridge, CvBridgeError
-import time
 
 class kd_info:
     def __init__(self) -> None:
@@ -28,7 +20,7 @@ class kd_info:
         self.text_thicknesses = [self.outline_thickness, 0]
 
         # calculations for formatting. height_size is not needed
-        self.txt_size , height_size = cv2.getTextSize(f"{self.k}", 
+        self.txt_size, height_size = cv2.getTextSize(f"{self.k}", 
                                         fontFace=self.text_font,
                                         fontScale=self.txt_scaling,
                                         thickness=self.outline_thickness)

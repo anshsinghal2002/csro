@@ -1,17 +1,10 @@
-import roslib
-import sys
 import rospy
 import cv2
-import argparse
-from std_msgs.msg import String
-from sensor_msgs.msg import Image, LaserScan
-from cv_bridge import CvBridge, CvBridgeError
-import time
+from sensor_msgs.msg import LaserScan
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 import os
-import asyncio
 
 class minimap:
     def __init__(self) -> None:

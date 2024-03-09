@@ -1,12 +1,3 @@
-import roslib
-import sys
-import rospy
-import cv2
-import argparse
-from std_msgs.msg import String
-from sensor_msgs.msg import Image
-from cv_bridge import CvBridge, CvBridgeError
-import time
 from hud_elements import healthbar, weapon_info
 
 # bottom hud elements are the healthbar and weapons info
