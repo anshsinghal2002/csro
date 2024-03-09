@@ -1,4 +1,3 @@
-  GNU nano 4.8                                       csro_core.launch                                                 
 <launch>
   <arg name="multi_robot_name" default=""/>
   <arg name="player_id" default="player_00"/>

@@ -4,7 +4,7 @@
   <arg name="player_id" default="player_00"/>
 
 
-  <include file="$(find turtlebot3_autorace_camera)/launch/csro_camera.launch">
+  <include file="$(find turtlebot3_bringup)/launch/csro_camera.launch">
     <arg name="player_id" value="$(arg player_id)"/>
   </include>
 
