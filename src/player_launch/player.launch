@@ -1,7 +1,8 @@
 <launch>
     <!--To launh, cli: roslaunch <package> <launchfile> <args>-->
-    <group ns="player_id">
-
+    <arg name="player_id" default="player00"/>
+    <group ns="$(arg player_id)">
+    <!-- <group ns="player_id"> -->
         
         <node name="hud" pkg="csro" type="player.py"/>
 
@@ -10,12 +11,12 @@
          
           <!-- teleopkey stuff-->
           <!-- turtlebot3_teleop_key already has its own built in velocity smoother -->
-          <node pkg="turtlebot3_teleop" type="turtlebot3_teleop_key" name="turtlebot3_teleop_keyboard"  output="screen">
-        </node>
+          <!-- <node pkg="turtlebot3_teleop" type="turtlebot3_teleop_key" name="turtlebot3_teleop_keyboard"  output="screen">
+        </node> -->
 
         
         <!-- controller stuff -->
-        <!-- <arg name="joy_config" default="ps3" />
+        <arg name="joy_config" default="ps3" />
         <arg name="joy_dev" default="/dev/input/js0" />
         <arg name="config_filepath" default="$(find teleop_twist_joy)/config/$(arg joy_config).config.yaml" />
 
@@ -27,7 +28,7 @@
 
         <node pkg="teleop_twist_joy" name="teleop_twist_joy" type="teleop_node">
             <rosparam command="load" file="$(arg config_filepath)" />
-        </node> -->
+        </node>
         
     </group>
 </launch>
