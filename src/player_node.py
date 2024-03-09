@@ -123,6 +123,7 @@ class HudUI:
 if  __name__ == '__main__':
  
     register_player = rospy.ServiceProxy('register_player', RegisterPlayer)
+    get_player = rospy.ServiceProxy('get_player', GetPlayer)
 
     parser = argparse.ArgumentParser(description='Fires up HUD elements')
     parser.add_argument('--player_id', type=str, default='default_player', help='player username for CS:RO', action='store')
@@ -133,7 +134,7 @@ if  __name__ == '__main__':
     plyr_id = rospy.get_param("player_id")
     plyr_clr = rospy.get_param("player_color")
     camera_ori = rospy.get_param("camera_upsidedown")
-    game_window = HudUI(plyr_id, plyr_clr, camera_ori, None)
+    game_window = HudUI(plyr_id, plyr_clr, camera_ori, get_player)
     rospy.init_node(f'game_window_converter_{args.player_id}_{args.band_color}', anonymous=True)
     rospy.Rate(60)
     try:
