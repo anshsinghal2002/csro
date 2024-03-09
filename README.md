@@ -24,7 +24,7 @@ roscd turtlebot3_bringup/launch/robot_launch_files
 chmod +x csro_camera.launch csro_core.launch csro_robot.launch csro_lidar.launch
 
 # Launch the turtlebot nodes with the correct player_id
-roslaunch turtlebot3_bringup csro_robot.launch player_id:=player_01
+roslaunch turtlebot3_bringup csro_robot.launch player_id:=<player_id>
 ```
 
 **Finally, on the lab machine run:**
@@ -34,5 +34,5 @@ roslaunch turtlebot3_bringup csro_robot.launch player_id:=player_01
 # Point the lab machine to the master lab machine instance
 
 # Run nodes for the player
-roslaunch csro player.launch player_id:=player_01
+roslaunch csro player.launch player_id:=<player_id>
 ```
