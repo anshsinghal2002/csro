@@ -7,10 +7,10 @@ import matplotlib.pyplot as plt
 import os
 
 class minimap:
-    def __init__(self) -> None:
+    def __init__(self, player_id) -> None:
         self.visible = True
         matplotlib.use('agg')  # speeds up the matplotlib stuff 
-        rospy.Subscriber('scan', LaserScan, self.laserReadingsCallback)
+        rospy.Subscriber(f'{player_id}/scan', LaserScan, self.laserReadingsCallback)
         self.angles = np.radians(np.arange(360))
         self.laserReadings = np.zeros(360)  # init as an array of 0s for now
         self.curr_path = os.path.dirname(__file__)  # directory if we were to display the graph

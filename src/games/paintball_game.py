@@ -1,5 +1,4 @@
-from games.player import Player
-from game import Game
+from games.game import Game
 from rospy import Duration
 
 class PaintballGame(Game):

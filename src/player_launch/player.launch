@@ -3,9 +3,9 @@
     <arg name="player_id" default="player00"/>
     <arg name="player_color" default="green"/>
     <arg name="camera_upsidedown" default="False"/>
-    <group ns="$(arg player_id)">
         
-        <node name="hud" pkg="csro" type="player_node.py"/>
+        <node name="hud" pkg="csro" type="player_node.py" />
+        
           <param name="player_id" value="$(arg player_id)"/>
           <param name="player_color" value="$(arg player_color)"/>
           <param name="camera_upsidedown" value="$(arg camera_upsidedown)"/>
@@ -17,7 +17,7 @@
         <!-- <node pkg="turtlebot3_teleop" type="turtlebot3_teleop_key" name="turtlebot3_teleop_keyboard"  output="screen">
         </node> -->
 
-        
+    <group ns="$(arg player_id)">
         <!-- controller stuff -->
         <arg name="joy_config" default="ps3" />
         <arg name="joy_dev" default="/dev/input/js0" />

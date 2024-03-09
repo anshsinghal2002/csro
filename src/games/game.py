@@ -1,5 +1,5 @@
 from csro.msg import GameState
-from player_node import Player
+from games.player import Player
 import rospy
 
 # Represents the base class for a game
@@ -13,7 +13,14 @@ class Game:
     # Function to construct a Player from a player_id and a color_str
     # Override to use game specific Player subclass
     def create_player(self, player_id, color_str):
-        return Player(player_id, color_str, self.get_total_hp())
+        return Player(player_id, color_str, self.total_hp)
+    
+    def get_player_id_from_color_str(self, color_str):
+        for player in self.players:
+            if player.color_str == color_str:
+                return player.id
+        
+        return "UNKNOWN"
     
     # Adds a player to the game
     def add_player(self, req):

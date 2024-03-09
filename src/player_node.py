@@ -11,6 +11,7 @@ from hitbox_detector import Hitbox_Detector
 from hitbox import Coords
 import numpy as np
 import random as rand
+from csro.srv import RegisterPlayer, GetPlayer
 # from csro.srv import RegisterPlayer
 # from csro.msg import HitEvent
 # from games import PaintballGame 
@@ -19,13 +20,14 @@ WINDOW_SIZE_SCALING = 2
 
 class HudUI:
     # instance variables
-    def __init__(self, player_id, band_color, camera_upsidedown):
-        self.image_pub = rospy.Publisher(f"gw_converter_{player_id}_{band_color}",Image,queue_size=10)
+    def __init__(self, player_id, band_color, camera_upsidedown, get_player):
+        self.image_pub = rospy.Publisher(f"{player_id}/gw_converter_{player_id}_{band_color}",Image,queue_size=10)
         self.bridge = CvBridge()
-        self.image_sub = rospy.Subscriber("camera/image",Image,self.image_callback)
-        self.joy_sub = rospy.Subscriber("joy", Joy, self.joy_callback)
+        self.image_sub = rospy.Subscriber(f"{player_id}/camera/image",Image,self.image_callback)
+        self.joy_sub = rospy.Subscriber(f"{player_id}/joy", Joy, self.joy_callback)
         self.cv_image = np.zeros((240,320,3), np.uint8)
         self.hitbox_img = np.zeros((240,320,3), np.uint8)
+        self.get_player = get_player
 
         self.player_id = player_id
         self.band_color = band_color
@@ -37,7 +39,7 @@ class HudUI:
         self.bottom_hud = bottom_hud.buttom_hud()
         self.kd_info = kd_info.kd_info()
         self.timer = timer.timer()
-        self.minimap = minimap.minimap()
+        self.minimap = minimap.minimap(player_id)
 
         # init game event animations
         self.dmg_ani = damaged.damaged()
@@ -81,6 +83,9 @@ class HudUI:
         self.timer.display(self.cv_image)
         self.game_event_listener(data)
 
+        if self.is_firing:
+            cv2.rectangle(self.cv_image, (30, 30), (60, 60), (0,0,255), 8)
+
         resized = cv2.resize(self.cv_image, (int(cols*WINDOW_SIZE_SCALING), int(rows*WINDOW_SIZE_SCALING)))
         cv2.imshow(f"playerID: {self.player_id} | Color: {self.band_color}", resized)
         
@@ -109,33 +114,33 @@ class HudUI:
 
     
     def joy_callback(self, data):
-        print(data.axes)
-        if data.axes[2] < 0.5 and not self.is_firing:
+        if data.axes[5] < 0.5:
             self.is_firing = True
-            self.fire()
         else:
             self.is_firing = False
         
 
 if  __name__ == '__main__':
+ 
+    register_player = rospy.ServiceProxy('register_player', RegisterPlayer)
+
     parser = argparse.ArgumentParser(description='Fires up HUD elements')
     parser.add_argument('--player_id', type=str, default='default_player', help='player username for CS:RO', action='store')
     parser.add_argument('--band_color', type=str, default='RBY', help="band color that the player's turtlebot is wearing", action='store')
     args, unknown = parser.parse_known_args()
 
-    # in order to get the args from the launch file:
-    # first find the namespace the node is under after using the launch file
-    plyr_ns = rospy.get_namespace()
-
     # then use the get_param method to get the player_id
-    plyr_id = rospy.get_param(f"{plyr_ns}/player_id")
-    plyr_clr = rospy.get_param(f"{plyr_ns}/player_color")
-    camera_ori = rospy.get_param(f"{plyr_ns}/camera_upsidedown")
-    game_window = HudUI(plyr_id, plyr_clr, camera_ori)
+    plyr_id = rospy.get_param("player_id")
+    plyr_clr = rospy.get_param("player_color")
+    camera_ori = rospy.get_param("camera_upsidedown")
+    game_window = HudUI(plyr_id, plyr_clr, camera_ori, None)
     rospy.init_node(f'game_window_converter_{args.player_id}_{args.band_color}', anonymous=True)
     rospy.Rate(60)
     try:
+        register_player(plyr_id, plyr_clr)
         rospy.spin()
+    except rospy.ServiceException as exc:
+        print("Service did not process request: " + str(exc))
     except KeyboardInterrupt:
         print("Shutting down")
     cv2.destroyAllWindows()
