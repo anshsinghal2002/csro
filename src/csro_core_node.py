@@ -7,8 +7,6 @@ from games import PaintballGame
 
 GAME_START_EVENT = "game_start"
 
-
-
 class CSROCore:
     def __init__(self, game_event_pub):
         # Players list
