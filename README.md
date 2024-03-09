@@ -23,7 +23,8 @@ roscd turtlebot3_bringup/launch/robot_launch_files
 # Make them executable
 chmod +x csro_camera.launch csro_core.launch csro_robot.launch csro_lidar.launch
 
-# Launch the turtlebot nodes with the correct player_id
+# Launch the turtlebot nodes with personal player username as the player_id arg
+# Example: player_id:=player_01
 roslaunch turtlebot3_bringup csro_robot.launch player_id:=player_01
 ```
 
@@ -32,7 +33,7 @@ roslaunch turtlebot3_bringup csro_robot.launch player_id:=player_01
 ```bash
 # PREREQUISITE:
 # Point the lab machine to the master lab machine instance
-
+# specify the player's color band (player_color:=) and the camera orientation (camera_upsidedown:=)
 # Run nodes for the player
-roslaunch csro player.launch player_id:=player_01
+roslaunch csro player.launch player_id:=player_01 player_color:=blue camera_upsidedown:=False
 ```
