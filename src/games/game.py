@@ -1,5 +1,5 @@
 from csro.msg import GameState
-from player import Player
+from player_node import Player
 import rospy
 
 # Represents the base class for a game
