@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
-from Hitbox import Hitbox
+from Hitbox import Hitbox, Rect, Coords
+
 class Hitbox_Detector:
     def __init__(self,color_ranges={'green':(np.array([64, 70, 66]),np.array([77, 207, 134]))}):
         self.color_ranges = color_ranges
@@ -24,7 +25,7 @@ class Hitbox_Detector:
                     x, y, w, h = cv2.boundingRect(contour)
                     if w * h > 10:
                         x,y,w,h = self.adjust_hitbox_ratio(x,y,w,h)
-                        hitbox = Hitbox(color,(x, y, x + w, y + h))
+                        hitbox = Hitbox(color, Rect(Coords(x, y), Coords(x + w, y + h)))
                         hitboxes.append(hitbox)
         return hitboxes
 
@@ -37,8 +38,8 @@ class Hitbox_Detector:
     def draw_hitboxes(self,img,hitboxes):
         for hitbox in hitboxes:
             label = hitbox.get_color()
-            x1,y1,x2,y2 = hitbox.get_rect()
-            cv2.rectangle(img, (x1, y1), (x2, y2), (170,200,200), 1)
+            rect = hitbox.get_rect()
+            cv2.rectangle(img, (rect.topLeft.x, rect.topLeft.y), (rect.bottomRight.x, rect.bottomRight.y), (170,200,200), 1)
         return img
 
 
