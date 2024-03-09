@@ -1,0 +1,23 @@
+<launch>
+  <arg name="multi_robot_name" default=""/>
+  <arg name="set_lidar_frame_id" default="base_scan"/>
+  <arg name="player_id" default="player_00"/>
+
+
+  <include file="$(find turtlebot3_autorace_camera)/launch/csro_camera.launch">
+    <arg name="player_id" value="$(arg player_id)"/>
+  </include>
+
+
+
+  <include file="$(find turtlebot3_bringup)/launch/csro_core.launch">
+    <arg name="multi_robot_name" value="$(arg multi_robot_name)"/>
+    <arg name="player_id" value="$(arg player_id)"/>
+  </include>
+  <include file="$(find turtlebot3_bringup)/launch/csro_lidar.launch">
+    <arg name="set_frame_id" value="$(arg set_lidar_frame_id)"/>
+    <arg name="player_id" value="$(arg player_id)"/>
+  </include>
+
+  <node pkg="turtlebot3_bringup" type="turtlebot3_diagnostics" name="turtlebot3_diagnostics" output="screen"/>
+</launch>

@@ -1,0 +1,14 @@
+  GNU nano 4.8                                       csro_core.launch                                                 
+<launch>
+  <arg name="multi_robot_name" default=""/>
+  <arg name="player_id" default="player_00"/>
+  <node pkg="rosserial_python" type="serial_node.py" name="turtlebot3_core" output="screen">
+    <param name="port" value="/dev/ttyACM0"/>
+    <param name="baud" value="115200"/>
+    <param name="tf_prefix" value="$(arg multi_robot_name)"/>
+    <remap from="/cmd_vel" to="/$(arg player_id)/cmd_vel"/>
+  </node>
+</launch>
+
+
+
