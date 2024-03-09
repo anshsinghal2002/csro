@@ -3,10 +3,12 @@ An augmented reality based robot first person shooter utilising a ROS based mess
 
 
 ## code to copy robot launch files
-scp -r robot_launch_files/ ubuntu@TURTLEBOT3_03.union.edu:~/catkin_ws/src
-
+scp -r robot_launch_files/ ubuntu@TURTLEBOT3_03.union.edu:~/catkin_ws/src/turtlebot3/turtlebot3_bringup/launch
+roscd turtlebot3_bringup/launch/robot_launch_files
+chmod +x csro_camera.launch csro_core.launch csro_robot.launch csro_lidar.launch
 
 ## code to launch robot
+roslaunch turtlebot3_bringup csro_robot.launch player_id:=player_01
 
 ## code to launch player
 roslaunch csro player.launch player_id:=player_01
