@@ -1,0 +1,6 @@
+<launch>
+    <!--To launh, cli: roslaunch <package> <launchfile> <args>-->
+    
+        <node name="hud" pkg="csro" type="hud.py"/>
+
+</launch>
