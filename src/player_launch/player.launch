@@ -1,17 +1,16 @@
 <launch>
-    <!--To launh, cli: roslaunch <package> <launchfile> <args>-->
+    <!--To launch, cli: roslaunch <package> <launchfile> <args>-->
     <arg name="player_id" default="player00"/>
     <group ns="$(arg player_id)">
-    <!-- <group ns="player_id"> -->
         
-        <node name="hud" pkg="csro" type="player.py"/>
+        <node name="hud" pkg="csro" type="player_node.py"/>
 
           <arg name="model" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger, waffle, waffle_pi]"/>
           <param name="model" value="$(arg model)"/>
          
-          <!-- teleopkey stuff-->
-          <!-- turtlebot3_teleop_key already has its own built in velocity smoother -->
-          <!-- <node pkg="turtlebot3_teleop" type="turtlebot3_teleop_key" name="turtlebot3_teleop_keyboard"  output="screen">
+        <!-- teleopkey stuff-->
+        <!-- turtlebot3_teleop_key already has its own built in velocity smoother -->
+        <!-- <node pkg="turtlebot3_teleop" type="turtlebot3_teleop_key" name="turtlebot3_teleop_keyboard"  output="screen">
         </node> -->
 
         
