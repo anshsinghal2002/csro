@@ -12,6 +12,7 @@ from hitbox import Coords
 import numpy as np
 import random as rand
 from csro.srv import RegisterPlayer, GetPlayer
+from csro.msg import GameState, GameEvent
 # from csro.srv import RegisterPlayer
 # from csro.msg import HitEvent
 # from games import PaintballGame 
@@ -20,11 +21,14 @@ WINDOW_SIZE_SCALING = 2
 
 class HudUI:
     # instance variables
-    def __init__(self, player_id, band_color, camera_upsidedown, get_player):
+    def __init__(self, player_id, band_color, camera_upsidedown, get_player, game_state):
         self.image_pub = rospy.Publisher(f"{player_id}/gw_converter_{player_id}_{band_color}",Image,queue_size=10)
         self.bridge = CvBridge()
         self.image_sub = rospy.Subscriber(f"{player_id}/camera/image",Image,self.image_callback)
         self.joy_sub = rospy.Subscriber(f"{player_id}/joy", Joy, self.joy_callback)
+        self.game_state_sub = rospy.Subscriber('/game_state', GameState, self.game_state_callback)
+        self.game_state = game_state
+        self.game_event_sub = rospy.Subscriber(f'/game_event', GameEvent, self.game_event_callback)
         self.cv_image = np.zeros((240,320,3), np.uint8)
         self.hitbox_img = np.zeros((240,320,3), np.uint8)
         self.get_player = get_player
@@ -45,6 +49,12 @@ class HudUI:
         # init game event animations
         self.dmg_ani = damaged.damaged()
 
+    def game_state_callback(self, game_state):
+        self.game_state = game_state
+
+    def game_event_callback(self, event: GameEvent):
+        # TODO: handle different game types
+        pass
 
     def image_callback(self,data):
         try:
@@ -141,11 +151,11 @@ if  __name__ == '__main__':
     plyr_id = rospy.get_param("player_id")
     plyr_clr = rospy.get_param("player_color")
     camera_ori = rospy.get_param("camera_upsidedown")
-    game_window = HudUI(plyr_id, plyr_clr, camera_ori, get_player)
-    rospy.init_node(f'game_window_converter_{args.player_id}_{args.band_color}', anonymous=True)
-    rospy.Rate(60)
     try:
-        register_player(plyr_id, plyr_clr)
+        game_state = register_player(plyr_id, plyr_clr)
+        game_window = HudUI(plyr_id, plyr_clr, camera_ori, get_player, game_state)
+        rospy.init_node(f'game_window_converter_{args.player_id}_{args.band_color}', anonymous=True)
+        rospy.Rate(60)
         rospy.spin()
     except rospy.ServiceException as exc:
         print("Service did not process request: " + str(exc))

@@ -9,7 +9,7 @@ GAME_START_EVENT = "game_start"
 GAME_EVENT_GOT_HIT = "got_hit"
 GAME_EVENT_ELIMED = "elimed"
 
-
+# TODO: Player Leave
 class CSROCore:
     def __init__(self):     
         self.game = PaintballGame()
@@ -18,8 +18,8 @@ class CSROCore:
     # RegisterPlayer service callback
     def register_player(self, req):
         self.game.add_player(req)
-        print(req)
-        return 1
+        print("Player joined:", req)
+        return self.game.getCurrentState()
     
     # GetPlayer service callback
     def get_player(self, req):
