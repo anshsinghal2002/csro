@@ -1,4 +1,5 @@
 import cv2
+from csro.msg import PlayerState
 
 class kd_info:
     def __init__(self) -> None:
@@ -28,7 +29,11 @@ class kd_info:
         pass
 
     
-    def display(self, cv_image):
+    def display(self, cv_image, player_state: PlayerState):
+        # update instance variables
+        self.k = player_state.num_elims
+        self.d = player_state.num_respawns
+        
         if self.visible:
             self.display_outlined_text(cv_image,
                                     text=f"K: {self.k}",

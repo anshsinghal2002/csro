@@ -24,7 +24,7 @@ class HudUI:
     def __init__(self, player_id, band_color, camera_upsidedown, get_player, game_state, apply_hit):
         self.image_pub = rospy.Publisher(f"{player_id}/gw_converter_{player_id}_{band_color}",Image,queue_size=10)
         self.bridge = CvBridge()
-        self.image_sub = rospy.Subscriber(f"{player_id}/camera/image",Image,self.image_callback)
+        self.image_sub = rospy.Subscriber(f"/{player_id}/camera/image",Image,self.image_callback)
         self.joy_sub = rospy.Subscriber(f"{player_id}/joy", Joy, self.joy_callback)
         self.game_state_sub = rospy.Subscriber('/game_state', GameState, self.game_state_callback)
         self.game_state = game_state
@@ -90,13 +90,14 @@ class HudUI:
 
         self.minimap.display(self.cv_image)
         self.crosshair.display(self.cv_image)
-        self.bottom_hud.display(self.cv_image)
-        self.kd_info.display(self.cv_image)
+        self.bottom_hud.display(self.cv_image,
+                                self.get_player(f"{self.band_color}").player,
+                                self.game_state.game_state.total_hp)
+        self.kd_info.display(self.cv_image, self.get_player(f"{self.band_color}").player)
         self.timer.display(self.cv_image)
         self.game_event_listener(data)
 
         if self.is_firing:
-            cv2.rectangle(self.cv_image, (30, 30), (60, 60), (0,0,255), 8)
             laser_start_point = (int((cols/ 2)+105-(5*self.fire_animation_frame)), int((rows / 2)+105-(5*self.fire_animation_frame)))
             laser_end_point = ((laser_start_point[0]-5),(laser_start_point[1]-5))
             cv2.line(self.cv_image, laser_start_point, laser_end_point, (0, 0, 200), 3)
@@ -110,9 +111,9 @@ class HudUI:
     def game_event_listener(self, data):
         cv_image = self.cv_image
         
-        # simulate taking damage in game. remove when csro node is done
-        if rand.randint(0, 255) < 10:
-            cv_image = self.dmg_ani.display(self.cv_image, dead=False)
+        # # simulate taking damage in game. remove when csro node is done
+        # if rand.randint(0, 255) < 10:
+        #     cv_image = self.dmg_ani.display(self.cv_image, dead=False)
         
         # simlate death 
         # cv_image = self.dmg_ani.display(self.cv_image, dead=True)    

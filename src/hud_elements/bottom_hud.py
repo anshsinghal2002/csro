@@ -1,5 +1,6 @@
 from hud_elements import healthbar, weapon_info
-
+from csro.srv import RegisterPlayer, GetPlayer, ApplyHit
+from csro.msg import GameState, GameEvent
 # bottom hud elements are the healthbar and weapons info
 # weapons info is displayed above the healthbar which is why
 # it is initialized with respect to the location of the healthbar
@@ -12,7 +13,7 @@ class buttom_hud:
         # init weapon info to be displayed above the healthbar 
         self.weapon_info = weapon_info.weapon_info(self.healthbar.brdr_topl, hb_top_center)
     
-    def display(self, cv_image):
-        self.healthbar.display(cv_image)
+    def display(self, cv_image, player_state, total_hp):
+        self.healthbar.display(cv_image, player_state, total_hp)
         self.weapon_info.display(cv_image)
         pass

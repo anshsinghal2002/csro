@@ -1,5 +1,5 @@
 import cv2
-
+from csro.msg import PlayerState
 
 class healthbar:
     ######################
@@ -41,7 +41,13 @@ class healthbar:
         self.thickness = -1  # -1 = colored in rectangle
 
 
-    def display(self, cv_image):
+    def display(self, cv_image, player_state: PlayerState, total_hp):
+
+        # update health values
+        self.max_health = total_hp
+        self.current_health = player_state.hp
+        self.health_percentage = int(round((self.current_health/self.max_health), 2) * 100)
+
         if self.visible:
         # draw boarder if turned on
             if self.boarder_visible:
@@ -76,9 +82,9 @@ class healthbar:
                         
         
                 
-            # code to test health bar
-            self.current_health -= 80
-            self.health_percentage = int(round((self.current_health/self.max_health), 2) * 100)
+            # # code to test health bar
+            # self.current_health -= 1
+            # self.health_percentage = int(round((self.current_health/self.max_health), 2) * 100)
         pass
         
             
