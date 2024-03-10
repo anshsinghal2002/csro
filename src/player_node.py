@@ -40,6 +40,7 @@ class HudUI:
         self.kd_info = kd_info.kd_info()
         self.timer = timer.timer()
         self.minimap = minimap.minimap(player_id)
+        self.fire_animation_frame = 0
 
         # init game event animations
         self.dmg_ani = damaged.damaged()
@@ -85,6 +86,9 @@ class HudUI:
 
         if self.is_firing:
             cv2.rectangle(self.cv_image, (30, 30), (60, 60), (0,0,255), 8)
+            laser_start_point = ((cols/ 2)-105+(5*self.fire_animation_frame), (rows / 2)-105+(5*self.fire_animation_frame))
+            laser_end_point = (laser_start_point[0]+5,laser_start_point[1]+5)
+            cv2.line(self.cv_image, laser_start_point, laser_end_point, (0, 0, 200), 3)
 
         resized = cv2.resize(self.cv_image, (int(cols*WINDOW_SIZE_SCALING), int(rows*WINDOW_SIZE_SCALING)))
         cv2.imshow(f"playerID: {self.player_id} | Color: {self.band_color}", resized)
@@ -106,11 +110,10 @@ class HudUI:
     
 
     def fire(self):
-        # detector = Hitbox_Detector()
-        # img = self.hitbox_img
-        # detector.draw_hitboxes_on_img(img)
-        # cv2.imshow(f"playerID: {self.player_id} hitboxes", img)
-        pass
+        if self.fire_animation_frame<=20:
+            self.fire_animation_frame+=1
+        else:
+            self.fire_animation_frame=0
 
     
     def joy_callback(self, data):
