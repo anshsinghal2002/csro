@@ -11,7 +11,7 @@ from hitbox_detector import Hitbox_Detector
 from hitbox import Coords
 import numpy as np
 import random as rand
-from csro.srv import RegisterPlayer, GetPlayer
+from csro.srv import RegisterPlayer, GetPlayer, ApplyHit
 from csro.msg import GameState, GameEvent
 # from csro.srv import RegisterPlayer
 # from csro.msg import HitEvent
@@ -21,7 +21,7 @@ WINDOW_SIZE_SCALING = 2
 
 class HudUI:
     # instance variables
-    def __init__(self, player_id, band_color, camera_upsidedown, get_player, game_state):
+    def __init__(self, player_id, band_color, camera_upsidedown, get_player, game_state, apply_hit):
         self.image_pub = rospy.Publisher(f"{player_id}/gw_converter_{player_id}_{band_color}",Image,queue_size=10)
         self.bridge = CvBridge()
         self.image_sub = rospy.Subscriber(f"{player_id}/camera/image",Image,self.image_callback)
@@ -29,6 +29,7 @@ class HudUI:
         self.game_state_sub = rospy.Subscriber('/game_state', GameState, self.game_state_callback)
         self.game_state = game_state
         self.game_event_sub = rospy.Subscriber(f'/game_event', GameEvent, self.game_event_callback)
+        self.apply_hit = apply_hit
         self.cv_image = np.zeros((240,320,3), np.uint8)
         self.hitbox_img = np.zeros((240,320,3), np.uint8)
         self.get_player = get_player
@@ -142,6 +143,7 @@ if  __name__ == '__main__':
  
     register_player = rospy.ServiceProxy('register_player', RegisterPlayer)
     get_player = rospy.ServiceProxy('get_player', GetPlayer)
+    apply_hit = rospy.ServiceProxy('apply_hit', ApplyHit)
 
     parser = argparse.ArgumentParser(description='Fires up HUD elements')
     parser.add_argument('--player_id', type=str, default='default_player', help='player username for CS:RO', action='store')
@@ -154,7 +156,7 @@ if  __name__ == '__main__':
     camera_ori = rospy.get_param("camera_upsidedown")
     try:
         game_state = register_player(plyr_id, plyr_clr)
-        game_window = HudUI(plyr_id, plyr_clr, camera_ori, get_player, game_state)
+        game_window = HudUI(plyr_id, plyr_clr, camera_ori, get_player, game_state, apply_hit)
         rospy.init_node(f'game_window_converter_{args.player_id}_{args.band_color}', anonymous=True)
         rospy.Rate(60)
         rospy.spin()
