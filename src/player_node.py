@@ -86,8 +86,8 @@ class HudUI:
 
         if self.is_firing:
             cv2.rectangle(self.cv_image, (30, 30), (60, 60), (0,0,255), 8)
-            laser_start_point = ((cols/ 2)-105+(5*self.fire_animation_frame), (rows / 2)-105+(5*self.fire_animation_frame))
-            laser_end_point = (laser_start_point[0]+5,laser_start_point[1]+5)
+            laser_start_point = (int((cols/ 2)+105-(5*self.fire_animation_frame)), int((rows / 2)+105-(5*self.fire_animation_frame)))
+            laser_end_point = ((laser_start_point[0]-5),(laser_start_point[1]-5))
             cv2.line(self.cv_image, laser_start_point, laser_end_point, (0, 0, 200), 3)
 
         resized = cv2.resize(self.cv_image, (int(cols*WINDOW_SIZE_SCALING), int(rows*WINDOW_SIZE_SCALING)))
@@ -118,11 +118,12 @@ class HudUI:
     
     def joy_callback(self, data):
         if data.axes[5] < 0:
+            self.fire()
             if self.is_firing:
                 return
 
             self.is_firing = True
-            self.fire()
+            
         else:
             self.is_firing = False
         
