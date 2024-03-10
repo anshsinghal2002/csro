@@ -1,0 +1,4 @@
+string shooter_id
+string hit_color_str
+---
+bool is_elim

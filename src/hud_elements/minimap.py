@@ -4,7 +4,6 @@ from sensor_msgs.msg import LaserScan
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-import os
 
 class minimap:
     def __init__(self, player_id) -> None:
@@ -13,7 +12,6 @@ class minimap:
         rospy.Subscriber(f'{player_id}/scan', LaserScan, self.laserReadingsCallback)
         self.angles = np.radians(np.arange(360))
         self.laserReadings = np.zeros(360)  # init as an array of 0s for now
-        self.curr_path = os.path.dirname(__file__)  # directory if we were to display the graph
         
         ####################
         # minimap settings #
@@ -26,13 +24,12 @@ class minimap:
         self.turtle_size = self.map_pt_thickness + 100  # size of the turtle on the center of the map
         self.turtle_dot_color = 'b'  # what color the center of the turtle
         self.map_bkgrnd = [255, 255, 255]  # black map backgorund color
-        
-        pass
     
+
     def display(self, cv_image):
         if self.visible and self.laserReadings.size != 0:
-        # using the lidar sensor readings, use trig to reconstruct a map of
-        # the turtlebot's surroundings
+            # using the lidar sensor readings, use trig to reconstruct a map of
+            # the turtlebot's surroundings
             xcoords = self.laserReadings * np.cos(self.angles)
             ycoords = self.laserReadings * np.sin(self.angles)
 
@@ -67,13 +64,8 @@ class minimap:
             minimap = cv2.rotate(minimap, cv2.ROTATE_90_COUNTERCLOCKWISE)
             # add image onto the game_window by overwriting the pixels
             cv_image[self.map_pos[1]:self.map_pos[1]+minimap.shape[0], self.map_pos[0]:self.map_pos[0]+minimap.shape[1]] = minimap
-            # cv2.imshow("Minimap", minimap)
-            # plt.savefig(self.curr_path + '/minimap.png', dpi=50, bbox_inches="tight")
             plt.close()
-            # return cv_image
-        pass
     
 
     def laserReadingsCallback(self, data:LaserScan):
         self.laserReadings = np.array(data.ranges)
-        pass

@@ -1,4 +1,4 @@
 string player_id
 string color_str
 ---
-int64 status
+GameState game_state

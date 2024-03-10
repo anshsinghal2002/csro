@@ -10,7 +10,6 @@ class Player:
         self.num_respawns = 0
 
     # Damages the player by "damage" hitpoints
-    # Returns whether this caused an elimination
     def hit(self, shooter_player, damage):
         self.hp -= damage
         
@@ -18,7 +17,6 @@ class Player:
             shooter_player.num_elims += 1 
             self.num_respawns += 1
             self.hp = self.total_hp
-            return True
 
         return False
 

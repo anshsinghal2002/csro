@@ -54,7 +54,6 @@ add_message_files(
    FILES
    GameEvent.msg
    GameState.msg
-   HitEvent.msg
    PlayerState.msg
 )
 
@@ -63,6 +62,7 @@ add_service_files(
    FILES
    RegisterPlayer.srv
    GetPlayer.srv
+   ApplyHit.srv
 )
 
 ## Generate actions in the 'action' folder
