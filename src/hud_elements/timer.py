@@ -36,7 +36,8 @@ class timer:
         self.outline_color = [0, 0, 0]  # black
         self.outline_thickness = 2
 
-    def display (self, cv_image):
+    
+    def display(self, cv_image):
         if self.timer_on:
             # if self.bkgrd_visible:
             #     print("background active")

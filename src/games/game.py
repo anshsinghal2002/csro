@@ -1,4 +1,5 @@
 from csro.msg import GameState
+from csro.srv import ApplyHitRequest
 from games.player import Player
 import rospy
 
@@ -15,29 +16,33 @@ class Game:
     def create_player(self, player_id, color_str):
         return Player(player_id, color_str, self.total_hp)
     
-    def get_player_id_from_color_str(self, color_str):
+    def get_player_from_color_str(self, color_str) -> Player:
         for player in self.players:
             if player.color_str == color_str:
-                return player.id
+                return player
         
-        return "UNKNOWN"
+        return None
+    
+    def get_player_by_id(self, id) -> Player:
+        for player in self.players:
+            if player.id == id:
+                return player
+        
+        return None
     
     # Adds a player to the game
     def add_player(self, req):
         self.players.append(self.create_player(req.player_id, req.color_str))
 
-
+    
     def start_game(self):
         self.game_start_time = rospy.get_rostime()
 
     # Callback for a hit event
     # Override to implement game specific logic
-    def on_hit(self, event):
-        for player in self.players:
-            if player.color_str == event.color_str: 
-                return player.hit(1)
-            
-        return None
+    def apply_hit(self, req: ApplyHitRequest):
+        hit_player = self.get_player_from_color_str(req.color_str)
+        return hit_player.hit(self.get_player_by_id(req.shooter_id), 1)
     
     def getCurrentState(self):
         state = GameState()

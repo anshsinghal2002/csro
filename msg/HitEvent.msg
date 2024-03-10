@@ -1,2 +1,0 @@
-string shooter_player_id
-string hit_color_str
