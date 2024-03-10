@@ -114,8 +114,12 @@ class HudUI:
 
     
     def joy_callback(self, data):
-        if data.axes[5] < 0.5:
+        if data.axes[5] < 0:
+            if self.is_firing:
+                return
+
             self.is_firing = True
+            self.fire()
         else:
             self.is_firing = False
         
