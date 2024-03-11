@@ -13,6 +13,7 @@ import numpy as np
 import random as rand
 from csro.srv import RegisterPlayer, GetPlayer, ApplyHit
 from csro.msg import GameState, GameEvent
+from csro_core_node import GAME_EVENT_GOT_HIT, GAME_EVENT_ELIMED
 # from csro.srv import RegisterPlayer
 # from csro.msg import HitEvent
 # from games import PaintballGame 
@@ -29,6 +30,7 @@ class HudUI:
         self.game_state_sub = rospy.Subscriber('/game_state', GameState, self.game_state_callback)
         self.game_state = game_state
         self.game_event_sub = rospy.Subscriber(f'/game_event', GameEvent, self.game_event_callback)
+        self.game_event = GameEvent()
         self.apply_hit = apply_hit
         self.cv_image = np.zeros((240,320,3), np.uint8)
         self.hitbox_img = np.zeros((240,320,3), np.uint8)
@@ -55,6 +57,7 @@ class HudUI:
 
     def game_event_callback(self, event: GameEvent):
         # TODO: handle different game types
+        self.game_event = event
         pass
 
     def image_callback(self,data):
@@ -72,7 +75,7 @@ class HudUI:
 
         (rows,cols,channels) = self.cv_image.shape
         
-        self.cv_image = self.game_event_listener(data)
+        self.cv_image = self.game_event_listener()
 
         detector = Hitbox_Detector()
         hitboxes = detector.detect_hitboxes(self.hitbox_img)
@@ -95,8 +98,9 @@ class HudUI:
                                 self.game_state.game_state.total_hp)
         self.kd_info.display(self.cv_image, self.get_player(f"{self.band_color}").player)
         self.timer.display(self.cv_image, self.game_state.game_state)
-        self.game_event_listener(data)
+        # self.game_event_listener()
 
+        # fire animation
         if self.is_firing:
             laser_frames = 10
             laser_scaling_factor = 100/laser_frames
@@ -110,15 +114,16 @@ class HudUI:
         cv2.waitKey(3)
     
     
-    def game_event_listener(self, data):
+    def game_event_listener(self):
         cv_image = self.cv_image
-        
-        # # simulate taking damage in game. remove when csro node is done
-        # if rand.randint(0, 255) < 10:
-        #     cv_image = self.dmg_ani.display(self.cv_image, dead=False)
-        
-        # simlate death 
-        # cv_image = self.dmg_ani.display(self.cv_image, dead=True)    
+        # if self.game_event.type != None:
+            # display animation if you get hit
+        if self.game_event.type == GAME_EVENT_GOT_HIT:
+            cv_image = self.dmg_ani.display(self.cv_image, dead=False)
+            
+        # display elimation animation
+        if self.game_event.type == GAME_EVENT_ELIMED:
+            cv_image = self.dmg_ani.display(self.cv_image, dead=True)    
 
         return cv_image
     

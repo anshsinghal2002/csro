@@ -8,8 +8,12 @@ class Game:
     def __init__(self, total_hp, game_duration):
         self.players = []
         self.total_hp = total_hp
-        self.game_duration = game_duration
-        self.game_start_time = None
+        # TODO rospynode needs to be initialized first before the rospy.get_rostime() function works
+        rospy.init_node('csro_core', anonymous=True)
+        rospy.Time.now()
+        # temporary bandaid fix. game_duration and start_time changed to rospy.get_rostime for the time being
+        self.game_duration = rospy.get_rostime()
+        self.game_start_time = rospy.get_rostime()
 
     # Function to construct a Player from a player_id and a color_str
     # Override to use game specific Player subclass
@@ -48,7 +52,11 @@ class Game:
         state = GameState()
         state.total_hp = self.total_hp
         state.game_start_time = self.game_start_time
-        state.game_end_time = self.game_start_time + self.game_duration
+        # TODO addition doesn't work between 2 rostimes
+        # state.game_end_time = self.game_start_time + self.game_duration
+
+        # # # bandaid fix just set end time to start time
+        state.game_end_time = self.game_start_time 
         state.players = [ player.getCurrentState() for player in self.players ]
         return state
 

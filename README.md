@@ -11,6 +11,9 @@ roscd csro
 # Copy launch files over to the turtlebot 
 # (change XX to be the correct #)
 scp -r robot_launch_files/ ubuntu@TURTLEBOT3_XX.union.edu:~/catkin_ws/src/turtlebot3/turtlebot3_bringup/launch 
+
+# rosrun the csro core
+rosrun csro csro_core_node.py 
 ```
 
 **ssh into the turtlebot and run:**
