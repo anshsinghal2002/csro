@@ -94,7 +94,7 @@ class HudUI:
                                 self.get_player(f"{self.band_color}").player,
                                 self.game_state.game_state.total_hp)
         self.kd_info.display(self.cv_image, self.get_player(f"{self.band_color}").player)
-        self.timer.display(self.cv_image)
+        self.timer.display(self.cv_image, self.game_state.game_state)
         self.game_event_listener(data)
 
         if self.is_firing:

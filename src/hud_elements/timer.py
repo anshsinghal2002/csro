@@ -1,6 +1,7 @@
 import cv2
 import time
-
+import rospy
+from csro.msg import GameState
 class timer:
     #######################################
     # timer instance variables + settings #
@@ -15,7 +16,7 @@ class timer:
         ############################################
         # settings for the background of the timer #
         ############################################
-        self.bkgrd_visible = True
+        self.bkgrd_visible = False
         self.bkgrd_color = [128, 128, 128]  # gray
         self.bkgrd_opacity = 0.5  # opacity of timer background (0.0 - 1.0)
         self.bkgrd_thickness = -1  # -1 = colors in the whole rectangle
@@ -37,30 +38,35 @@ class timer:
         self.outline_thickness = 2
 
     
-    def display(self, cv_image):
+    def display(self, cv_image, game_state: GameState):
         if self.timer_on:
-            # if self.bkgrd_visible:
-            #     print("background active")
-            #     # copy to apply opacity effect later
-            #     cv_img_cpy = cv_image.copy()  
-            #     cv2.rectangle(cv_img_cpy, 
-            #                   pt1=self.bkgrd_topl, 
-            #                   pt2=self.bkgrd_btmr,
-            #                   color=self.bkgrd_color,
-            #                   thickness=self.bkgrd_thickness,
-            #                   )
-            #     # apply opacity effect
-            #     cv_image = cv2.addWeighted(cv_image,
-            #                                0.3, 
-            #                                cv_img_cpy,  
-            #                                0.7, 
-            #                                0)
-                
-            #     # cv2.imshow(f"txt",cv_image) 
+            
+            # update instance vars based on gamestate and calculate the time to be displayed
+            self.timer_end = game_state.game_end_time
+            self.start_time = game_state.game_start_time
+            # remaining_time = self.timer_end - time.time()
+            remaining_time = self.timer_end - rospy.get_rostime()
 
-            # calculate the time to be displayed
-            remaining_time = self.timer_end - time.time()
-            if remaining_time <= 0:
+            if self.bkgrd_visible:
+                # copy to apply opacity effect later
+                cv_img_cpy = cv_image.copy()  
+                cv2.rectangle(cv_img_cpy, 
+                              pt1=self.bkgrd_topl, 
+                              pt2=self.bkgrd_btmr,
+                              color=self.bkgrd_color,
+                              thickness=self.bkgrd_thickness,
+                              )
+                # apply opacity effect
+                cv_image = cv2.addWeighted(cv_image,
+                                           0.3, 
+                                           cv_img_cpy,  
+                                           0.7, 
+                                           0)
+                
+                # cv2.imshow(f"txt",cv_image) 
+
+
+            if remaining_time.secs <= 0:
                 minutes = 0
                 seconds = 0
             else:
