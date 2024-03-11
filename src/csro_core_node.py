@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import rospy
+from std_msgs.msg import Empty
 from csro.srv import RegisterPlayer, GetPlayer, ApplyHit, ApplyHitRequest
 from csro.msg import GameState, GameEvent
 from games.paintball_game import PaintballGame
@@ -13,7 +14,12 @@ GAME_EVENT_ELIMED = "elimed"
 class CSROCore:
     def __init__(self):     
         self.game = PaintballGame()
-        self.game_state_pub = rospy.Publisher('/game_state', GameState)
+        self.game_state_pub = rospy.Publisher('/game_state', GameState, queue_size=10)
+
+    def start_game(self, _):
+        self.game.start_game()
+        self.game_state_pub.publish(self.game.getCurrentState())
+        print('Game started!')
 
     # RegisterPlayer service callback
     def register_player(self, req):
@@ -38,9 +44,9 @@ class CSROCore:
 
     # ApplyHit service callback
     def apply_hit(self, req: ApplyHitRequest):
-        is_elim = self.game.on_hit(req)
+        is_elim = self.game.apply_hit(req)
         
-        hit_player = self.get_player_from_color_str(req.hit_color_str)
+        hit_player = self.game.get_player_from_color_str(req.hit_color_str)
         event = GameEvent(GAME_EVENT_GOT_HIT)
         if is_elim:
             event = GameEvent(GAME_EVENT_ELIMED)
@@ -56,12 +62,14 @@ class CSROCore:
 
 
 if  __name__ == '__main__':
-    core = CSROCore()
-
     rospy.init_node('csro_core', anonymous=True)
+    
+    core = CSROCore()    
     rospy.Service('register_player', RegisterPlayer, core.register_player)
     rospy.Service('get_player', GetPlayer, core.get_player)
     rospy.Service('apply_hit', ApplyHit, core.apply_hit)
+    
+    s = rospy.Subscriber('/start_game', Empty, core.start_game, queue_size=10)
 
     try:
         print("-=-=- CSRO core started -=-=-")

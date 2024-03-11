@@ -7,13 +7,10 @@ import rospy
 class Game:
     def __init__(self, total_hp, game_duration):
         self.players = []
-        self.total_hp = total_hp
-        # TODO rospynode needs to be initialized first before the rospy.get_rostime() function works
-        rospy.init_node('csro_core', anonymous=True)
-        rospy.Time.now()
-        # temporary bandaid fix. game_duration and start_time changed to rospy.get_rostime for the time being
-        self.game_duration = rospy.get_rostime()
+        self.total_hp = total_hp        
         self.game_start_time = rospy.get_rostime()
+        self.game_duration = game_duration
+        self.has_started = False
 
     # Function to construct a Player from a player_id and a color_str
     # Override to use game specific Player subclass
@@ -27,6 +24,7 @@ class Game:
         
         return None
     
+    # Gets a Player by their id
     def get_player_by_id(self, id) -> Player:
         for player in self.players:
             if player.id == id:
@@ -38,25 +36,24 @@ class Game:
     def add_player(self, req):
         self.players.append(self.create_player(req.player_id, req.color_str))
 
-    
+    # Starts the game
     def start_game(self):
         self.game_start_time = rospy.get_rostime()
+        self.has_started = True
 
     # Callback for a hit event
     # Override to implement game specific logic
     def apply_hit(self, req: ApplyHitRequest):
-        hit_player = self.get_player_from_color_str(req.color_str)
+        hit_player = self.get_player_from_color_str(req.hit_color_str)
         return hit_player.hit(self.get_player_by_id(req.shooter_id), 1)
     
+    # Converts this class to a GameState message
     def getCurrentState(self):
         state = GameState()
         state.total_hp = self.total_hp
         state.game_start_time = self.game_start_time
-        # TODO addition doesn't work between 2 rostimes
-        # state.game_end_time = self.game_start_time + self.game_duration
-
-        # # # bandaid fix just set end time to start time
-        state.game_end_time = self.game_start_time 
+        state.game_end_time = self.game_start_time + self.game_duration
         state.players = [ player.getCurrentState() for player in self.players ]
+        state.has_started = self.has_started
         return state
 

@@ -22,7 +22,7 @@ WINDOW_SIZE_SCALING = 2
 
 class HudUI:
     # instance variables
-    def __init__(self, player_id, band_color, camera_upsidedown, get_player, game_state, apply_hit):
+    def __init__(self, player_id, band_color, camera_upsidedown, get_player, game_state: GameState, apply_hit):
         self.image_pub = rospy.Publisher(f"{player_id}/gw_converter_{player_id}_{band_color}",Image,queue_size=10)
         self.bridge = CvBridge()
         self.image_sub = rospy.Subscriber(f"/{player_id}/camera/image",Image,self.image_callback)
@@ -91,13 +91,15 @@ class HudUI:
             
             cv2.rectangle(self.cv_image, (rect.topLeft.x, rect.topLeft.y), (rect.bottomRight.x, rect.bottomRight.y), color, strokeWidth)
 
+
+
         self.minimap.display(self.cv_image)
         self.crosshair.display(self.cv_image)
         self.bottom_hud.display(self.cv_image,
                                 self.get_player(f"{self.band_color}").player,
-                                self.game_state.game_state.total_hp)
+                                self.game_state.total_hp)
         self.kd_info.display(self.cv_image, self.get_player(f"{self.band_color}").player)
-        self.timer.display(self.cv_image, self.game_state.game_state)
+        self.timer.display(self.cv_image, self.game_state)
         # self.game_event_listener()
 
         # fire animation
@@ -108,6 +110,9 @@ class HudUI:
             laser_end_point = ((laser_start_point[0]-5),(laser_start_point[1]-5))
             cv2.line(self.cv_image, laser_start_point, laser_end_point, (0, 0, 200), 3)
 
+        if not self.game_state.has_started or self.game_state.game_start_time > self.game_state.game_end_time:
+            cv2.rectangle(self.cv_image, (0, 0), (cols, rows), (0,0,255), -1)
+
         resized = cv2.resize(self.cv_image, (int(cols*WINDOW_SIZE_SCALING), int(rows*WINDOW_SIZE_SCALING)))
         cv2.imshow(f"playerID: {self.player_id} | Color: {self.band_color}", resized)
         
@@ -117,55 +122,69 @@ class HudUI:
     def game_event_listener(self):
         cv_image = self.cv_image
         # if self.game_event.type != None:
-            # display animation if you get hit
-        if self.game_event.type == GAME_EVENT_GOT_HIT:
-            cv_image = self.dmg_ani.display(self.cv_image, dead=False)
             
-        # display elimation animation
-        if self.game_event.type == GAME_EVENT_ELIMED:
+        if self.game_event.type == GAME_EVENT_GOT_HIT:
+            # display animation if you get hit
+            cv_image = self.dmg_ani.display(self.cv_image, dead=False)
+        elif self.game_event.type == GAME_EVENT_ELIMED:
+            # display elimation animation
             cv_image = self.dmg_ani.display(self.cv_image, dead=True)    
 
         return cv_image
     
 
-    def fire(self):
+    def play_shoot_anim(self):
         if self.fire_animation_frame<=20:
             self.fire_animation_frame+=1
         else:
             self.fire_animation_frame=0
 
+
+    def fire(self):
+        detector = Hitbox_Detector()
+        hitboxes = detector.detect_hitboxes(self.hitbox_img)
+
+        (rows,cols,channels) = self.cv_image.shape
+        for hitbox in hitboxes:
+            hit_color_str = hitbox.get_color()
+            if hitbox.get_rect().contains(Coords(cols/ 2, rows / 2)):
+                is_elim = self.apply_hit(self.player_id, hit_color_str)
+
     
     def joy_callback(self, data):
         if data.axes[5] < 0:
-            self.fire()
+            self.play_shoot_anim()
             if self.is_firing:
                 return
 
             self.is_firing = True
-            
+            self.fire()
         else:
             self.is_firing = False
         
 
 if  __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Fires up HUD elements')
+    parser.add_argument('--player_id', type=str, default='default_player', help='player username for CS:RO', action='store')
+    parser.add_argument('--band_color', type=str, default='RBY', help="band color that the player's turtlebot is wearing", action='store')
+    args, unknown = parser.parse_known_args()
+    rospy.init_node(f'game_window_converter_{args.player_id}_{args.band_color}', anonymous=True)
+
+    rospy.wait_for_service('register_player')
+    rospy.wait_for_service('get_player')
+    rospy.wait_for_service('apply_hit')
  
     register_player = rospy.ServiceProxy('register_player', RegisterPlayer)
     get_player = rospy.ServiceProxy('get_player', GetPlayer)
     apply_hit = rospy.ServiceProxy('apply_hit', ApplyHit)
 
-    parser = argparse.ArgumentParser(description='Fires up HUD elements')
-    parser.add_argument('--player_id', type=str, default='default_player', help='player username for CS:RO', action='store')
-    parser.add_argument('--band_color', type=str, default='RBY', help="band color that the player's turtlebot is wearing", action='store')
-    args, unknown = parser.parse_known_args()
-
-    # then use the get_param method to get the player_id
     plyr_id = rospy.get_param("player_id")
     plyr_clr = rospy.get_param("player_color")
     camera_ori = rospy.get_param("camera_upsidedown")
+
     try:
-        game_state = register_player(plyr_id, plyr_clr)
-        game_window = HudUI(plyr_id, plyr_clr, camera_ori, get_player, game_state, apply_hit)
-        rospy.init_node(f'game_window_converter_{args.player_id}_{args.band_color}', anonymous=True)
+        resp = register_player(plyr_id, plyr_clr)
+        game_window = HudUI(plyr_id, plyr_clr, camera_ori, get_player, resp.game_state, apply_hit)
         rospy.Rate(60)
         rospy.spin()
     except rospy.ServiceException as exc:

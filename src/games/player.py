@@ -17,6 +17,7 @@ class Player:
             shooter_player.num_elims += 1 
             self.num_respawns += 1
             self.hp = self.total_hp
+            return True
 
         return False
 

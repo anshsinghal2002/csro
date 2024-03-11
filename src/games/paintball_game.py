@@ -3,6 +3,8 @@ from rospy import Duration
 
 class PaintballGame(Game):
     def __init__(self):
-        super().__init__(total_hp=10, game_duration=Duration(5 * 60))
+        PAINTBALL_TOTAL_HP = 10
+        PAINTBALL_GAME_DURATION = Duration(5 * 60)
+        super().__init__(PAINTBALL_TOTAL_HP, PAINTBALL_GAME_DURATION)
 
 

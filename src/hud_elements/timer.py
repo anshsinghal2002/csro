@@ -70,8 +70,8 @@ class timer:
                 minutes = 0
                 seconds = 0
             else:
-                minutes = int(remaining_time // 60)
-                seconds = int(remaining_time % 60)
+                minutes = int(remaining_time.to_sec() // 60)
+                seconds = int(remaining_time.to_sec() % 60)
 
             timer_text = f"{minutes}:{str(seconds).zfill(2)}"
 
