@@ -98,7 +98,9 @@ class HudUI:
         self.game_event_listener(data)
 
         if self.is_firing:
-            laser_start_point = (int((cols/ 2)+105-(5*self.fire_animation_frame)), int((rows / 2)+105-(5*self.fire_animation_frame)))
+            laser_frames = 10
+            laser_scaling_factor = 100/laser_frames
+            laser_start_point = (int((cols/ 2)+105-((laser_scaling_factor)*self.fire_animation_frame)), int((rows / 2)+105-((laser_scaling_factor)*self.fire_animation_frame)))
             laser_end_point = ((laser_start_point[0]-5),(laser_start_point[1]-5))
             cv2.line(self.cv_image, laser_start_point, laser_end_point, (0, 0, 200), 3)
 
