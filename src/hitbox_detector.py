@@ -25,6 +25,7 @@ class Hitbox_Detector:
         for color,ranges in self.color_ranges.items():
             mask = None
             
+            # since red has two color bands (wraps around on the hue scale)
             for color_range in ranges:
                 range_mask = cv2.inRange(hsv, color_range.lowerBound, color_range.upperBound)
                 if mask is None:
