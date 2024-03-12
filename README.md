@@ -1,9 +1,10 @@
 # csro
 An augmented reality based robot first person shooter utilising a ROS based messaging architecture. HUD implementation, OpenCV based hit detection, joystick control, unique game-modes and weapon classes.
 
+![image info](gameplay_1.png)
 
 ## Steps to run
-
+Assuming an appropriate ROS installation and packaging of the CSRO files
 **On the lab machine run:**
 ```bash
 roscd csro
