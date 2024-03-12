@@ -39,6 +39,7 @@ class PlayerNode:
         # State
         self.game_state = game_state
         self.is_firing = False
+        self.game_event = GameEvent()
         
         # Images
         self.bridge = CvBridge()
@@ -46,7 +47,7 @@ class PlayerNode:
         self.hitbox_img = np.zeros((240,320,3), np.uint8)
 
         # HUD elements & Animations
-        self.hud = HUD()
+        self.hud = HUD(player_id)
         self.dmg_ani = damaged.Damaged()
         self.fire_animation_frame = 0
     
@@ -133,7 +134,7 @@ class PlayerNode:
         detector = HitboxDetector()
         hitboxes = detector.detect_hitboxes(self.hitbox_img)
         for hitbox in hitboxes:
-            label = f"{hitbox.get_color()}:{self.get_player('red').player.hp}"
+            label = f"{hitbox.get_color()}:{self.get_player(str(hitbox.get_color())).player.hp} hp"
             rect = hitbox.get_rect()
 
             strokeWidth = 1
@@ -151,7 +152,7 @@ class PlayerNode:
     # Displays the fire animation
     def display_fire_animation(self, cols, rows):
         if self.is_firing:
-            laser_frames = 10
+            laser_frames = 20
             laser_scaling_factor = 100/laser_frames
             laser_start_point = (int((cols/ 2)+105-((laser_scaling_factor)*self.fire_animation_frame)), int((rows / 2)+105-((laser_scaling_factor)*self.fire_animation_frame)))
             laser_end_point = ((laser_start_point[0]-5),(laser_start_point[1]-5))
@@ -161,6 +162,8 @@ class PlayerNode:
     def display_waiting_screen(self, cols, rows):
         if not self.game_state.has_started or self.game_state.game_start_time > self.game_state.game_end_time:
             cv2.rectangle(self.cv_image, (0, 0), (cols, rows), (0,0,0), -1)
+            cv2.putText(self.cv_image, "WAITING FOR GAME", (10,rows//2), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1, cv2.LINE_AA)
+            cv2.putText(self.cv_image, "START", (cols//2-50,rows//2+50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1, cv2.LINE_AA)
 
 
 if  __name__ == '__main__':
