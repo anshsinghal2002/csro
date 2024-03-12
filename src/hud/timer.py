@@ -2,7 +2,8 @@ import cv2
 import time
 import rospy
 from csro.msg import GameState
-class timer:
+
+class Timer:
     #######################################
     # timer instance variables + settings #
     #######################################

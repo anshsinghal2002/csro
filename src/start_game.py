@@ -6,6 +6,6 @@ rospy.init_node('game_starter')
 pub = rospy.Publisher('/start_game', Empty, queue_size=10)
 
 while True:
-    input('Press enter to start')
+    input('Press enter to start game')
     pub.publish(Empty())
     print('Published')

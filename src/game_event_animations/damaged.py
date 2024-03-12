@@ -1,19 +1,6 @@
-import roslib
-import sys
-import rospy
 import cv2
-import argparse
-from std_msgs.msg import String
-from sensor_msgs.msg import Image, LaserScan
-from cv_bridge import CvBridge, CvBridgeError
-import time
-import numpy as np
-import matplotlib
-import matplotlib.pyplot as plt
-import os
-import asyncio
 
-class damaged:
+class Damaged:
     def __init__(self) -> None:
         #########################
         # damage flash settings #
@@ -42,7 +29,6 @@ class damaged:
                                         fontFace=self.text_font,
                                         fontScale=self.font_scale,
                                         thickness=self.outline_thickness)
-        pass
 
     def display(self, cv_image, dead: bool):
         # copy image to apply opacity effect
@@ -83,4 +69,3 @@ class damaged:
                         fontScale=scale, 
                         color=self.text_colors[i], 
                         thickness=self.text_thicknesses[i] + text_thickness)
-        pass

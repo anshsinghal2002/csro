@@ -1,6 +1,6 @@
 import cv2
 
-class crosshair:
+class Crosshair:
     ##############################
     # crosshair default settings #
     ##############################
@@ -37,8 +37,3 @@ class crosshair:
                           btm_r, 
                           color=self.color, 
                           thickness=self.thickness)
-                             
-
-            
-            
-        pass

@@ -1,7 +1,7 @@
 import cv2
 from csro.msg import PlayerState
 
-class healthbar:
+class Healthbar:
     ######################
     # healthbar settings #
     ######################
@@ -80,12 +80,6 @@ class healthbar:
                         color=self.hlth_txt_color, 
                         thickness=self.hlth_prct_thickness)
                         
-        
-                
-            # # code to test health bar
-            # self.current_health -= 1
-            # self.health_percentage = int(round((self.current_health/self.max_health), 2) * 100)
-        pass
         
             
         

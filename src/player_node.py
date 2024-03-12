@@ -2,64 +2,93 @@
 import rospy
 import cv2
 import argparse
-from std_msgs.msg import String
 from sensor_msgs.msg import Image, Joy
 from cv_bridge import CvBridge, CvBridgeError
-from hud_elements import crosshair, healthbar, timer, minimap, bottom_hud, kd_info
+from hud.hud import HUD
 from game_event_animations import damaged
-from hitbox_detector import Hitbox_Detector
+from hitbox_detector import HitboxDetector
 from hitbox import Coords
 import numpy as np
-import random as rand
 from csro.srv import RegisterPlayer, GetPlayer, ApplyHit
 from csro.msg import GameState, GameEvent
 from csro_core_node import GAME_EVENT_GOT_HIT, GAME_EVENT_ELIMED
-# from csro.srv import RegisterPlayer
-# from csro.msg import HitEvent
-# from games import PaintballGame 
 
 WINDOW_SIZE_SCALING = 2
 
-class HudUI:
+class PlayerNode:
     # instance variables
     def __init__(self, player_id, band_color, camera_upsidedown, get_player, game_state: GameState, apply_hit):
-        self.image_pub = rospy.Publisher(f"{player_id}/gw_converter_{player_id}_{band_color}",Image,queue_size=10)
-        self.bridge = CvBridge()
-        self.image_sub = rospy.Subscriber(f"/{player_id}/cv_camera/image_raw",Image,self.image_callback)
-        self.joy_sub = rospy.Subscriber(f"{player_id}/joy", Joy, self.joy_callback)
-        self.game_state_sub = rospy.Subscriber('/game_state', GameState, self.game_state_callback)
-        self.game_state = game_state
-        self.game_event_sub = rospy.Subscriber(f'/game_event', GameEvent, self.game_event_callback)
-        self.game_event = GameEvent()
-        self.apply_hit = apply_hit
-        self.cv_image = np.zeros((240,320,3), np.uint8)
-        self.hitbox_img = np.zeros((240,320,3), np.uint8)
-        self.get_player = get_player
-
+        # Arguments
         self.player_id = player_id
         self.band_color = band_color
-        self.is_firing = False
         self.camera_upsdwn = camera_upsidedown
+        
+        # Publishers
+        self.image_pub = rospy.Publisher(f"{player_id}/gw_converter_{player_id}_{band_color}", Image, queue_size=10)
+        
+        # Subscribers
+        self.image_sub = rospy.Subscriber(f"/{player_id}/cv_camera/image_raw", Image, self.image_callback)
+        self.joy_sub = rospy.Subscriber(f"{player_id}/joy", Joy, self.joy_callback)
+        self.game_state_sub = rospy.Subscriber('/game_state', GameState, self.game_state_callback)
+        self.game_event_sub = rospy.Subscriber(f'/game_event', GameEvent, self.game_event_callback)
+        
+        # Service proxies
+        self.apply_hit = apply_hit
+        self.get_player = get_player
+        
+        # State
+        self.game_state = game_state
+        self.is_firing = False
+        
+        # Images
+        self.bridge = CvBridge()
+        self.cv_image = np.zeros((240,320,3), np.uint8)
+        self.hitbox_img = np.zeros((240,320,3), np.uint8)
 
-        # init hud elements
-        self.crosshair = crosshair.crosshair()
-        self.bottom_hud = bottom_hud.buttom_hud()
-        self.kd_info = kd_info.kd_info()
-        self.timer = timer.timer()
-        self.minimap = minimap.minimap(player_id)
+        # HUD elements & Animations
+        self.hud = HUD()
+        self.dmg_ani = damaged.Damaged()
         self.fire_animation_frame = 0
-
-        # init game event animations
-        self.dmg_ani = damaged.damaged()
-
+    
+    # Callback when the game state changes
     def game_state_callback(self, game_state):
         self.game_state = game_state
 
+    # Callback when this player recieves a GameEvent
     def game_event_callback(self, event: GameEvent):
-        # TODO: handle different game types
         self.game_event = event
-        pass
 
+     # Callback for joy events
+    def joy_callback(self, data):
+        if data.axes[5] < 0:
+            self.play_shoot_anim()
+            if self.is_firing:
+                return
+
+            self.is_firing = True
+            self.fire()
+        else:
+            self.is_firing = False
+
+    # Progresses the shoot animation forward
+    def play_shoot_anim(self):
+        if self.fire_animation_frame<=20:
+            self.fire_animation_frame+=1
+        else:
+            self.fire_animation_frame=0
+
+    # Fires a paintball at the crosshair's current location
+    def fire(self):
+        detector = HitboxDetector()
+        hitboxes = detector.detect_hitboxes(self.hitbox_img)
+
+        (rows,cols,channels) = self.cv_image.shape
+        for hitbox in hitboxes:
+            hit_color_str = hitbox.get_color()
+            if hitbox.get_rect().contains(Coords(cols/ 2, rows / 2)):
+                is_elim = self.apply_hit(self.player_id, hit_color_str)
+
+    # Callback for every frame
     def image_callback(self,data):
         try:
             self.cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
@@ -74,10 +103,34 @@ class HudUI:
             print(e)
 
         (rows,cols,channels) = self.cv_image.shape
+        player_state =  self.get_player(f"{self.band_color}").player
         
-        self.cv_image = self.game_event_listener()
+        # Draw all elements on the image
+        self.display_game_event(self.game_event)
+        self.display_enemy_hitboxes(cols, rows)
+        self.hud.display(self.cv_image, self.game_state, player_state)
+        self.display_fire_animation(cols, rows)
+        self.display_waiting_screen(cols, rows)
+        
+        # Show the window
+        resized = cv2.resize(self.cv_image, (int(cols*WINDOW_SIZE_SCALING), int(rows*WINDOW_SIZE_SCALING)))
+        cv2.imshow(f"playerID: {self.player_id} | Color: {self.band_color}", resized)
+        cv2.waitKey(3)
+    
+    # Displays animations for GameEvents
+    def display_game_event(self, game_event):
+        cv_image = self.cv_image
+            
+        if game_event.type == GAME_EVENT_GOT_HIT:
+            cv_image = self.dmg_ani.display(self.cv_image, dead=False)
+        elif game_event.type == GAME_EVENT_ELIMED:
+            cv_image = self.dmg_ani.display(self.cv_image, dead=True)    
 
-        detector = Hitbox_Detector()
+        return cv_image
+    
+    # Displays hitboxes of enemies
+    def display_enemy_hitboxes(self, cols, rows):
+        detector = HitboxDetector()
         hitboxes = detector.detect_hitboxes(self.hitbox_img)
         for hitbox in hitboxes:
             label = f"{hitbox.get_color()}:{self.get_player('red').player.hp}"
@@ -95,18 +148,8 @@ class HudUI:
             cv2.putText(self.cv_image, label, label_position, font, 0.5, (255, 255, 255), 1, cv2.LINE_AA)
             cv2.rectangle(self.cv_image, (rect.topLeft.x, rect.topLeft.y), (rect.bottomRight.x, rect.bottomRight.y), color, strokeWidth)
 
-
-
-        self.minimap.display(self.cv_image)
-        self.crosshair.display(self.cv_image)
-        self.bottom_hud.display(self.cv_image,
-                                self.get_player(f"{self.band_color}").player,
-                                self.game_state.total_hp)
-        self.kd_info.display(self.cv_image, self.get_player(f"{self.band_color}").player)
-        self.timer.display(self.cv_image, self.game_state)
-        # self.game_event_listener()
-
-        # fire animation
+    # Displays the fire animation
+    def display_fire_animation(self, cols, rows):
         if self.is_firing:
             laser_frames = 10
             laser_scaling_factor = 100/laser_frames
@@ -114,58 +157,11 @@ class HudUI:
             laser_end_point = ((laser_start_point[0]-5),(laser_start_point[1]-5))
             cv2.line(self.cv_image, laser_start_point, laser_end_point, (0, 0, 200), 3)
 
+    # Displays a screen signifying that the game has not started
+    def display_waiting_screen(self, cols, rows):
         if not self.game_state.has_started or self.game_state.game_start_time > self.game_state.game_end_time:
-            cv2.rectangle(self.cv_image, (0, 0), (cols, rows), (0,0,255), -1)
+            cv2.rectangle(self.cv_image, (0, 0), (cols, rows), (0,0,0), -1)
 
-        resized = cv2.resize(self.cv_image, (int(cols*WINDOW_SIZE_SCALING), int(rows*WINDOW_SIZE_SCALING)))
-        cv2.imshow(f"playerID: {self.player_id} | Color: {self.band_color}", resized)
-        
-        cv2.waitKey(3)
-    
-    
-    def game_event_listener(self):
-        cv_image = self.cv_image
-        # if self.game_event.type != None:
-            
-        if self.game_event.type == GAME_EVENT_GOT_HIT:
-            # display animation if you get hit
-            cv_image = self.dmg_ani.display(self.cv_image, dead=False)
-        elif self.game_event.type == GAME_EVENT_ELIMED:
-            # display elimation animation
-            cv_image = self.dmg_ani.display(self.cv_image, dead=True)    
-
-        return cv_image
-    
-
-    def play_shoot_anim(self):
-        if self.fire_animation_frame<=20:
-            self.fire_animation_frame+=1
-        else:
-            self.fire_animation_frame=0
-
-
-    def fire(self):
-        detector = Hitbox_Detector()
-        hitboxes = detector.detect_hitboxes(self.hitbox_img)
-
-        (rows,cols,channels) = self.cv_image.shape
-        for hitbox in hitboxes:
-            hit_color_str = hitbox.get_color()
-            if hitbox.get_rect().contains(Coords(cols/ 2, rows / 2)):
-                is_elim = self.apply_hit(self.player_id, hit_color_str)
-
-    
-    def joy_callback(self, data):
-        if data.axes[5] < 0:
-            self.play_shoot_anim()
-            if self.is_firing:
-                return
-
-            self.is_firing = True
-            self.fire()
-        else:
-            self.is_firing = False
-        
 
 if  __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Fires up HUD elements')
@@ -188,7 +184,7 @@ if  __name__ == '__main__':
 
     try:
         resp = register_player(plyr_id, plyr_clr)
-        game_window = HudUI(plyr_id, plyr_clr, camera_ori, get_player, resp.game_state, apply_hit)
+        node = PlayerNode(plyr_id, plyr_clr, camera_ori, get_player, resp.game_state, apply_hit)
         rospy.Rate(60)
         rospy.spin()
     except rospy.ServiceException as exc:

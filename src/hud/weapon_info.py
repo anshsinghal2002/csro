@@ -1,6 +1,6 @@
 import cv2
 
-class weapon_info:
+class WeaponInfo:
     def __init__(self, healthbar_topl, hb_top_center) -> None:
         self.visible = True
         self.weapon_name = "Weapon"
@@ -22,7 +22,7 @@ class weapon_info:
         self.text_thicknesses = [self.outline_thickness, 0]
 
 
-    def display (self, cv_image):
+    def display(self, cv_image):
         # display weapon name
         self.display_outlined_text(cv_image,
                                    text=self.weapon_name,

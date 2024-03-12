@@ -10,7 +10,6 @@ GAME_START_EVENT = "game_start"
 GAME_EVENT_GOT_HIT = "got_hit"
 GAME_EVENT_ELIMED = "elimed"
 
-# TODO: Player Leave
 class CSROCore:
     def __init__(self):     
         self.game = PaintballGame()
@@ -68,7 +67,6 @@ if  __name__ == '__main__':
     rospy.Service('register_player', RegisterPlayer, core.register_player)
     rospy.Service('get_player', GetPlayer, core.get_player)
     rospy.Service('apply_hit', ApplyHit, core.apply_hit)
-    
     s = rospy.Subscriber('/start_game', Empty, core.start_game, queue_size=10)
 
     try:

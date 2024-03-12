@@ -1,7 +1,7 @@
 import cv2
 from csro.msg import PlayerState
 
-class kd_info:
+class KDInfo:
     def __init__(self) -> None:
         self.visible = True
         self.k = 420

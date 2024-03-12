@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 
-class minimap:
+class Minimap:
     def __init__(self, player_id) -> None:
         self.visible = True
         matplotlib.use('agg')  # speeds up the matplotlib stuff 

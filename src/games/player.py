@@ -1,5 +1,6 @@
 from csro.msg import PlayerState
 
+# Represents a player in a game
 class Player:
     def __init__(self, player_id, color_str, total_hp):
         self.id = player_id
@@ -20,8 +21,9 @@ class Player:
             return True
 
         return False
-
-    def getCurrentState(self):
+    
+    # Converts this class to a PlayerState message
+    def getCurrentState(self) -> PlayerState:
         state = PlayerState()
         state.id = self.id
         state.hp = self.hp

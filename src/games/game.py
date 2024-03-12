@@ -17,6 +17,7 @@ class Game:
     def create_player(self, player_id, color_str):
         return Player(player_id, color_str, self.total_hp)
     
+    # Gets a player from their corresponding color_str
     def get_player_from_color_str(self, color_str) -> Player:
         for player in self.players:
             if player.color_str == color_str:
@@ -48,7 +49,7 @@ class Game:
         return hit_player.hit(self.get_player_by_id(req.shooter_id), 1)
     
     # Converts this class to a GameState message
-    def getCurrentState(self):
+    def getCurrentState(self) -> GameState:
         state = GameState()
         state.total_hp = self.total_hp
         state.game_start_time = self.game_start_time
