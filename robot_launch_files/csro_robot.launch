@@ -3,7 +3,7 @@
   <arg name="set_lidar_frame_id" default="base_scan"/>
   <arg name="player_id" default="player_00"/>
 
-
+<group ns="$(arg player_id)">
   <include file="$(find turtlebot3_bringup)/launch/robot_launch_files/csro_camera.launch">
     <arg name="player_id" value="$(arg player_id)"/>
   </include>
@@ -20,4 +20,5 @@
   </include>
 
   <node pkg="turtlebot3_bringup" type="turtlebot3_diagnostics" name="turtlebot3_diagnostics" output="screen"/>
+</group>
 </launch>

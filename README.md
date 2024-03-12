@@ -38,4 +38,9 @@ roslaunch turtlebot3_bringup csro_robot.launch player_id:=<player_id>
 # specify the player's color band (player_color:=) and the camera orientation (camera_upsidedown:=)
 # Run nodes for the player
 roslaunch csro player.launch player_id:=<player_id>
+
+# start game:
+rosrun csro start_game.py
 ```
+
+

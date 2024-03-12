@@ -25,7 +25,7 @@ class HudUI:
     def __init__(self, player_id, band_color, camera_upsidedown, get_player, game_state: GameState, apply_hit):
         self.image_pub = rospy.Publisher(f"{player_id}/gw_converter_{player_id}_{band_color}",Image,queue_size=10)
         self.bridge = CvBridge()
-        self.image_sub = rospy.Subscriber(f"/{player_id}/camera/image",Image,self.image_callback)
+        self.image_sub = rospy.Subscriber(f"/{player_id}/cv_camera/image_raw",Image,self.image_callback)
         self.joy_sub = rospy.Subscriber(f"{player_id}/joy", Joy, self.joy_callback)
         self.game_state_sub = rospy.Subscriber('/game_state', GameState, self.game_state_callback)
         self.game_state = game_state
