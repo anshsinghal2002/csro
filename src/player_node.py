@@ -80,7 +80,7 @@ class HudUI:
         detector = Hitbox_Detector()
         hitboxes = detector.detect_hitboxes(self.hitbox_img)
         for hitbox in hitboxes:
-            label = hitbox.get_color()
+            label = f"{hitbox.get_color()}:{self.get_player('red').player.hp}"
             rect = hitbox.get_rect()
 
             strokeWidth = 1
@@ -89,6 +89,10 @@ class HudUI:
                 strokeWidth = 3
                 color = (0,0,255)
             
+
+            font = cv2.FONT_HERSHEY_SIMPLEX
+            label_position = (rect.topLeft.x, rect.topLeft.y - 10) 
+            cv2.putText(self.cv_image, label, label_position, font, 0.5, (255, 255, 255), 1, cv2.LINE_AA)
             cv2.rectangle(self.cv_image, (rect.topLeft.x, rect.topLeft.y), (rect.bottomRight.x, rect.bottomRight.y), color, strokeWidth)
 
 
