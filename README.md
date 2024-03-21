@@ -45,4 +45,10 @@ roslaunch csro player.launch player_id:=<player_id>
 rosrun csro start_game.py
 ```
 
+## Contributors:
+
+- Eric Zhao
+- James Heffernan
+- Ansh Singhal
+
 
