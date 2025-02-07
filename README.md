@@ -50,5 +50,3 @@ rosrun csro start_game.py
 - Eric Zhao
 - James Heffernan
 - Ansh Singhal
-
-
